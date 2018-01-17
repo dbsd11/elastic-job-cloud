@@ -29,6 +29,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -53,8 +54,8 @@ public final class BootstrapEnvironment {
     
     private Properties getProperties() {
         Properties result = new Properties();
-        try (FileInputStream fileInputStream = new FileInputStream(PROPERTIES_PATH)) {
-            result.load(fileInputStream);
+        try (InputStream ins = getClass().getClassLoader().getResourceAsStream("conf/elastic-job-cloud-scheduler.properties")) {
+            result.load(ins);
         } catch (final IOException ex) {
             log.warn("Can not load properties file from path: '{}'.", PROPERTIES_PATH);
         }
