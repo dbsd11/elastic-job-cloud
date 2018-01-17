@@ -225,6 +225,17 @@ public final class TaskLaunchScheduledService extends AbstractScheduledService {
         } else {
             result.setExtract(true);
         }
+
+        //通过url判断文件save名称
+        String fileName = appConfig.getAppURL();
+        if (fileName.contains("?")) {
+            fileName = fileName.substring(0, fileName.indexOf("?") - 1);
+        }
+        if (fileName.endsWith("/")) {
+            fileName = fileName.substring(0, fileName.length() - 1);
+        }
+        fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
+        result.setOutputFile(fileName);
         return result.build();
     }
     
