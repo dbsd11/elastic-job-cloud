@@ -40,29 +40,29 @@ import java.util.Properties;
  */
 @Slf4j
 public final class BootstrapEnvironment {
-    
+
     @Getter
     private static BootstrapEnvironment instance = new BootstrapEnvironment();
-    
+
     private static final String PROPERTIES_PATH = "conf/elastic-job-cloud-scheduler.properties";
-    
+
     private final Properties properties;
-    
+
     private BootstrapEnvironment() {
         properties = getProperties();
     }
-    
+
     private Properties getProperties() {
         Properties result = new Properties();
-        try (InputStream ins = getClass().getClassLoader().getResourceAsStream("conf/elastic-job-cloud-scheduler.properties")) {
-            result.load(ins);
+        try (FileInputStream fileInputStream = new FileInputStream(PROPERTIES_PATH)) {
+            result.load(fileInputStream);
         } catch (final IOException ex) {
             log.warn("Can not load properties file from path: '{}'.", PROPERTIES_PATH);
         }
         setPropertiesByEnv(result);
         return result;
     }
-    
+
     private void setPropertiesByEnv(final Properties prop) {
         for (EnvironmentArgument each : EnvironmentArgument.values()) {
             String key = each.getKey();
@@ -73,7 +73,7 @@ public final class BootstrapEnvironment {
             }
         }
     }
-    
+
     /**
      * 获取Framework的Hostname和Port.
      *
@@ -82,7 +82,7 @@ public final class BootstrapEnvironment {
     public String getFrameworkHostPort() {
         return String.format("%s:%d", getMesosConfiguration().getHostname(), getRestfulServerConfiguration().getPort());
     }
-    
+
     /**
      * 获取Mesos配置对象.
      *
@@ -91,10 +91,10 @@ public final class BootstrapEnvironment {
     public MesosConfiguration getMesosConfiguration() {
         return new MesosConfiguration(getValue(EnvironmentArgument.USER), getValue(EnvironmentArgument.MESOS_URL), getValue(EnvironmentArgument.HOSTNAME));
     }
-    
+
     /**
      * 获取Zookeeper配置对象.
-     * 
+     *
      * @return Zookeeper配置对象
      */
     // TODO 其他zkConfig的值可配置
@@ -106,7 +106,7 @@ public final class BootstrapEnvironment {
         }
         return result;
     }
-    
+
     /**
      * 获取Restful服务器配置对象.
      *
@@ -115,7 +115,7 @@ public final class BootstrapEnvironment {
     public RestfulServerConfiguration getRestfulServerConfiguration() {
         return new RestfulServerConfiguration(Integer.parseInt(getValue(EnvironmentArgument.PORT)));
     }
-    
+
     /**
      * 获取Mesos框架配置对象.
      *
@@ -124,7 +124,7 @@ public final class BootstrapEnvironment {
     public FrameworkConfiguration getFrameworkConfiguration() {
         return new FrameworkConfiguration(Integer.parseInt(getValue(EnvironmentArgument.JOB_STATE_QUEUE_SIZE)), Integer.parseInt(getValue(EnvironmentArgument.RECONCILE_INTERVAL_MINUTES)));
     }
-    
+
     /**
      * 获取作业数据库事件配置.
      *
@@ -145,7 +145,7 @@ public final class BootstrapEnvironment {
         }
         return Optional.absent();
     }
-    
+
     /**
      * 获取作业数据库事件配置Map.
      *
@@ -161,10 +161,10 @@ public final class BootstrapEnvironment {
         result.put(EnvironmentArgument.EVENT_TRACE_RDB_PASSWORD.getKey(), getValue(EnvironmentArgument.EVENT_TRACE_RDB_PASSWORD));
         return result;
     }
-    
+
     /**
      * 获取该framework的mesos角色.
-     * 
+     *
      * @return 角色的可选值.
      */
     public Optional<String> getMesosRole() {
@@ -174,7 +174,7 @@ public final class BootstrapEnvironment {
         }
         return Optional.of(role);
     }
-    
+
     private String getValue(final EnvironmentArgument environmentArgument) {
         String result = properties.getProperty(environmentArgument.getKey(), environmentArgument.getDefaultValue());
         if (environmentArgument.isRequired()) {
@@ -182,34 +182,34 @@ public final class BootstrapEnvironment {
         }
         return result;
     }
-    
+
     /**
      * 环境参数.
-     * 
+     *
      * @author zhangliang
      */
     @RequiredArgsConstructor
     @Getter
     public enum EnvironmentArgument {
-        
+
         HOSTNAME("hostname", "localhost", true),
-        
+
         MESOS_URL("mesos_url", "zk://localhost:2181/mesos", true),
-        
+
         MESOS_ROLE("mesos_role", "", false),
-        
+
         USER("user", "", false),
-        
+
         ZOOKEEPER_SERVERS("zk_servers", "localhost:2181", true),
-        
+
         ZOOKEEPER_NAMESPACE("zk_namespace", "elastic-job-cloud", true),
-        
+
         ZOOKEEPER_DIGEST("zk_digest", "", false),
-        
+
         PORT("http_port", "8899", true),
-        
+
         JOB_STATE_QUEUE_SIZE("job_state_queue_size", "10000", true),
-        
+
         EVENT_TRACE_RDB_DRIVER("event_trace_rdb_driver", "", false),
 
         EVENT_TRACE_RDB_URL("event_trace_rdb_url", "", false),
@@ -217,13 +217,13 @@ public final class BootstrapEnvironment {
         EVENT_TRACE_RDB_USERNAME("event_trace_rdb_username", "", false),
 
         EVENT_TRACE_RDB_PASSWORD("event_trace_rdb_password", "", false),
-    
+
         RECONCILE_INTERVAL_MINUTES("reconcile_interval_minutes", "-1", false);
-        
+
         private final String key;
-        
+
         private final String defaultValue;
-        
+
         private final boolean required;
     }
 }
