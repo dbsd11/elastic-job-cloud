@@ -66,6 +66,7 @@ public final class TaskContext {
         metaInfo = new MetaInfo(jobName, shardingItem);
         this.type = type;
         this.slaveId = slaveId;
+        id = jobName;
         id = Joiner.on(DELIMITER).join(metaInfo, type, slaveId, UUID.randomUUID().toString());
     }
     
@@ -114,7 +115,8 @@ public final class TaskContext {
      * @return 任务名称
      */
     public String getTaskName() {
-        return Joiner.on(DELIMITER).join(metaInfo, type, slaveId);
+        return metaInfo.getJobName();
+//        return Joiner.on(DELIMITER).join(metaInfo, type, slaveId);
     }
     
     /**

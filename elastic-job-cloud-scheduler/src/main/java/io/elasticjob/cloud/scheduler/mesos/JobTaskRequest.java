@@ -47,7 +47,7 @@ public final class JobTaskRequest implements TaskRequest {
     
     @Override
     public String taskGroupName() {
-        return "";
+        return jobConfig.getAppName();
     }
     
     @Override
